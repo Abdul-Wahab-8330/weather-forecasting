@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecasting System</title>
+    <link rel="icon" href="icon.png">
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+    
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #1e1e2f;
+            color: #f4f4f9;
+            line-height: 1.6;
+        }
+    
+        /* Navbar */
+        header {
+    background: rgba(26, 25, 25, 0.5); /* Semi-transparent black overlay */
+    backdrop-filter: blur(10px); /* Subtle blur for blending */
+    -webkit-backdrop-filter: blur(10px); /* Safari compatibility */
+    padding: 0.6rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+    
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+    
+        .logo img {
+            height: 60px;
+        }
+    
+        .logo span {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+    
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+    
+        nav ul li {
+            margin: 0 1rem;
+        }
+    
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
+    
+        nav ul li a:hover {
+            text-decoration: underline;
+        }
+    
+        /* Hero Section */
+        #home {
+            background: url('clouds1.mp4') no-repeat center center/cover;
+            position: relative;
+            color: white;
+            height: 70vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+    
+        #home::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+        }
+    
+        #home .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+    
+        #home h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    
+        #home p {
+            font-size: 1.2rem;
+        }
+    
+        /* Prediction Page */
+        #user {
+            background: linear-gradient(135deg, #3a3a54, #1e1e2f);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 2rem;
+        }
+        #user h1{
+            font-size: 2rem;
+            
+        }
+    
+        #user form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    
+        #user label {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+    
+        #user input, #user select, #user button {
+            padding: 0.8rem;
+            margin-top: 0.5rem;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+    
+        #user button {
+            background: #ff9800;
+            color: white;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: 0.3s;
+        }
+    
+        #user button:hover {
+            background: #ff5722;
+        }
+    
+        /* Popup container styling */
+#result-popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px; /* Larger popup */
+    background-color: #3a3a54; /* Dark background */
+    border: 1px solid #444; /* Subtle border */
+    border-radius: 12px; /* Rounded corners */
+    padding: 30px;
+    z-index: 1000;
+    display: none; /* Initially hidden */
+    color: #ffffff; /* White text for contrast */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.8); /* Enhanced shadow */
+}
+
+/* Close button styling */
+#close-popup {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-size: 25px;
+    font-weight: bold;
+    color: #aaaaaa; /* Light grey for close button */
+    cursor: pointer;
+    transition: color 0.3s, transform 0.3s;
+}
+
+#close-popup:hover {
+    color: #e74c3c; /* Red color on hover */
+    transform: scale(1.2); /* Slightly enlarge on hover */
+}
+
+/* Popup heading */
+#result-popup h2 {
+    margin: 0;
+    font-size: 2rem; /* Larger heading */
+    color: #ffffff; /* White heading text */
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+/* Popup text styling */
+#result-popup p {
+    font-size: 1.2rem; /* Larger text */
+    color: #dcdcdc; /* Light grey for readability */
+    text-align: center;
+    line-height: 1.6;
+}
+
+/* Background overlay */
+/* Background overlay */
+#popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9); /* Increased opacity to 0.9 */
+    z-index: 999;
+    display: none; /* Initially hidden */
+}
+
+
+/* Make text inside popup selectable */
+#result-popup {
+    user-select: text;
+}
+
+        /* Documentation Page */
+        #docs {
+            background: #1e1e2f;
+            color: white;
+            padding: 3rem 2rem;
+        }
+    
+        #docs h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+    
+        #docs p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+        }
+    
+        footer {
+            background: #1e1e2f;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        .predict-btn {
+    background: #ff9800;
+    color: white;
+    padding: 0.8rem 1.5rem;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+
+
+.predict-btn:hover {
+    background: #ff5722;
+    transform: scale(1.05);
+}
+#background-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+#background-video img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    display: none; /* Hidden unless video fails */
+}
+
+    
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            header{
+                padding: 0.5rem 1rem;
+            }
+
+            nav ul {
+                display: none;
+            }
+    
+            nav ul li {
+                margin: 0.5rem 0;
+            }
+    
+            #home h1 {
+                font-size: 2rem;
+            }
+    
+            #home p {
+                font-size: 1rem;
+            }
+    
+            #user {
+                margin: 1rem;
+            }
+        }
+    </style>
+    
+</head>
+<body>
+    <!-- Navbar -->
+    <header>
+        <a href="#home" style="color:white; text-decoration: none;"><div class="logo">
+            <img src="logo1.png" alt="Weather Forecast Logo">
+            <span>WeatherForecast</span>
+        </div></a>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#user">Prediction</a></li>
+                <li><a href="#docs">Documentation</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home">
+        <video autoplay muted loop playsinline id="background-video">
+            <source src="clouds3b.mp4" type="video/mp4">
+            <!-- fallback image -->
+            <img src="herobg1.jpg" alt="Background Image" style="width: 100%; height: auto;">
+        </video>
+
+        <div class="hero-content">
+            <h1>Welcome to Weather Forecasting System</h1>
+            <p>Accurate weather predictions made easy!</p>
+            <button class="predict-btn" onclick="location.href='#user'">Predict Now</button>
+        </div>
+    </section>
+    
+
+    <!-- Prediction Page -->
+<section id="user">
+    <h1>Predict Weather</h1>
+    <form id="weatherForm">
+        <label for="location">Location:</label>
+        <input type="text" id="location" placeholder="Enter location" required>
+        
+        <label for="temperature">Temperature (°C):</label>
+        <select id="temperature">
+            <option value="Below 0">Below 0</option>
+            <option value="0-10">0-10</option>
+            <option value="10-20">10-20</option>
+            <option value="20-30">20-30</option>
+            <option value="30-40">30-40</option>
+            <option value="40-50">40-50</option>
+            <option value="Above 50">Above 50</option>
+        </select>
+        
+        <label for="humidity">Humidity:</label>
+        <select id="humidity">
+            <option value="Very Low">Very Low</option>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Very High">Very High</option>
+        </select>
+        
+        <button type="submit">Get Prediction</button>
+    </form>
+</section>
+
+<div id="result-popup">
+    <span id="close-popup">&times;</span>
+    <h2>Weather Prediction</h2>
+    <p id="result-text"></p>
+</div>
+
+<!-- Documentation Page -->
+<section id="docs" style="color: #fff; background-color: #1f1e2c; padding: 20px 50px; border-radius: 15px; border: 1px solid #11486d; margin:0px 20px">
+    <h1 style="font-size: 2rem; margin-bottom: 10px;">Documentation</h1>
+    <p style="font-size: 1rem; margin-bottom: 20px; line-height: 1.6;">
+        This guide provides an overview of how to use the weather prediction tool effectively. By following the steps below, 
+        you can quickly enter the required details, interpret the results, and make the most of this tool for your weather-related needs.
+    </p>
+
+    <div class="doc-section" style="margin-bottom: 20px;">
+        <h2 style="font-size: 1.3rem; color: #fff;">How to Use</h2>
+        <ul style="font-size: 0.95rem; line-height: 1.8;">
+            <li>
+                <strong>Location:</strong> Input the name of your city, such as "Paris" or "New York," to specify where you want the weather forecast.
+            </li>
+            <li>
+                <strong>Temperature:</strong> Select a temperature range that suits your query, from ❄️ Below 0°C for freezing conditions to 🔥 Above 30°C for hot weather.
+            </li>
+            <li>
+                <strong>Humidity:</strong> Choose a humidity level to refine your results: Low 💧 for dry climates, Medium 🌫️ for balanced conditions, or High 🌊 for humid areas.
+            </li>
+            <li>
+                <strong>Prediction:</strong> Once all fields are completed, click the "Get Prediction" button to see the weather forecast tailored to your inputs.
+            </li>
+        </ul>
+    </div>
+
+    <div class="doc-section" style="margin-bottom: 20px;">
+        <h3 style="font-size: 1.3rem; color: #fff;">Interpreting Results</h3>
+        <p style="font-size: 0.95rem; line-height: 1.6;">
+            After submitting your inputs, the tool will generate a simple yet informative weather forecast. Here's what the results include:
+        </p>
+        <ul style="font-size: 0.95rem; line-height: 1.8;">
+            <li><strong>Location:</strong> Displays the city you entered in the input field.</li>
+            <li><strong>Temperature & Humidity:</strong> Reflects the selections you made for these parameters.</li>
+            <li>
+                <strong>Weather Forecast:</strong> Offers a brief prediction that includes visual emojis for better understanding, such as ☀️ for sunny weather or 🌧️ for rain.
+            </li>
+        </ul>
+    </div>
+
+    <div class="doc-section" style="margin-bottom: 20px;">
+        <h3 style="font-size: 1.3rem; color: #fff;">Popup</h3>
+        <p style="font-size: 0.95rem; line-height: 1.6;">
+            The results are displayed in a popup window for convenience. To close the popup and return to the main screen, simply click the close button (×) located in the top-right corner.
+        </p>
+    </div>
+
+    <div class="doc-section" style="margin-bottom: 15px;">
+        <h3 style="font-size: 1.3rem; color: #fff;">Feedback</h3>
+        <p style="font-size: 0.95rem; line-height: 1.6;">
+            We value your feedback and are here to help if you have any questions or concerns. Feel free to reach out to us via email at 
+            <a href="mailto:abdulwahabeeee5@gmail.com" style="color: #f39c12; text-decoration: none;">abdulwahabeeee5@gmail.com</a>. 
+            Your input helps us improve and serve you better.
+        </p>
+    </div>
+</section>
+
+
+
+
+
+
+<footer>
+    <p>&copy; 2024 WeatherForecast. All Rights Reserved.</p>
+</footer>
+
+<script>
+    // Function to generate weather prediction
+    function getWeatherPrediction() {
+        const location = document.getElementById('location').value;
+        const temperature = document.getElementById('temperature').value;
+        const humidity = document.getElementById('humidity').value;
+
+        const emojis = {
+            'Below 0': '❄️',
+            '0-10': '🌧️',
+            '10-20': '🌤️',
+            '20-30': '☀️',
+            '30-40': '🌡️',
+            '40-50': '🔥',
+            'Above 50': '🔥',
+            'Very Low': '💨',
+            'Low': '💧',
+            'Medium': '🌫️',
+            'High': '🌊',
+            'Very High': '🌪️'
+        };
+
+        // Prediction logic based on temperature
+        let temperatureMessage;
+        if (temperature === 'Below 0') {
+            temperatureMessage = 'freezing cold, bundle up!';
+        } else if (temperature === '0-10') {
+            temperatureMessage = 'chilly, wear a warm jacket.';
+        } else if (temperature === '10-20') {
+            temperatureMessage = 'cool, perfect for a light jacket.';
+        } else if (temperature === '20-30') {
+            temperatureMessage = 'comfortable, ideal for outdoor activities.';
+        } else if (temperature === '30-40') {
+            temperatureMessage = 'hot, stay hydrated!';
+        } else if (temperature === '40-50') {
+            temperatureMessage = 'extremely hot, avoid the sun.';
+        } else if (temperature === 'Above 50') {
+            temperatureMessage = 'dangerously hot, stay indoors and keep cool.';
+        }
+
+        // Prediction logic based on humidity
+        let humidityMessage;
+        if (humidity === 'Very Low') {
+            humidityMessage = 'The air is very dry, so drink plenty of water.';
+        } else if (humidity === 'Low') {
+            humidityMessage = 'The air is dry, consider moisturizing.';
+        } else if (humidity === 'Medium') {
+            humidityMessage = 'The air is moderately humid, feel comfortable.';
+        } else if (humidity === 'High') {
+            humidityMessage = 'It’s quite humid, dress lightly.';
+        } else if (humidity === 'Very High') {
+            humidityMessage = 'The air is very humid, expect discomfort and sweat.';
+        }
+
+        // Combined prediction message
+        const prediction = `In ${location}, with a temperature of ${temperature}°C ${emojis[temperature]} and ${humidity} humidity ${emojis[humidity]}, the weather is predicted to be ${temperatureMessage} ${humidityMessage}`;
+
+        // Update the result popup with the new prediction
+        document.getElementById('result-text').innerHTML = prediction;
+    }
+
+    // Form submission event
+    document.getElementById('weatherForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        getWeatherPrediction();
+        document.getElementById('result-popup').style.display = 'block';
+    });
+
+    // Close popup
+    document.getElementById('close-popup').addEventListener('click', () => {
+        document.getElementById('result-popup').style.display = 'none';
+    });
+
+    // Dynamically update prediction when the temperature or humidity changes
+    document.getElementById('temperature').addEventListener('change', getWeatherPrediction);
+    document.getElementById('humidity').addEventListener('change', getWeatherPrediction);
+</script>
+
+</body>
+</html>
